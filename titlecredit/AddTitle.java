@@ -28,6 +28,18 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 
+/**
+ * 
+ * Responsible for adding title scenes onto a video file. It draws the title
+ * part of the Title/Credit tab, and manages the background processes for adding
+ * and editing titles.
+ * 
+ * It is quite similar to AddCredit, however requires more steps than AddTitle,
+ * hence is placed in a separate class.
+ * 
+ * @author zoe
+ *
+ */
 public class AddTitle extends JPanel {
 	private JPanel inputPanel = new JPanel();
 	private JLabel inputFileLabel = new JLabel("Source file: ");

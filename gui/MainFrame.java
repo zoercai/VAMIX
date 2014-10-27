@@ -29,18 +29,23 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-
 import audio.AudioTab;
 import subtitle.SubtitleTab;
-import titlecredit.AddTitle;
 import titlecredit.TitleCreditTab;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 
+/**
+ * 
+ * This is the main GUI. It draws the main frame, and adds all components into
+ * it.
+ * 
+ * @author zoe
+ *
+ */
 public class MainFrame {
 	JFrame frame;
 	JSplitPane main = new JSplitPane();
-	
+
 	// left-----------------------------------------------
 	private JPanel left = new JPanel(new BorderLayout());
 
@@ -63,7 +68,7 @@ public class MainFrame {
 	VideoPlayer videoPlayer;
 	EmbeddedMediaPlayer mediaPlayer;
 	String _videoLocation;
-	
+
 	// Dock section
 	private JPanel dock = new JPanel(new BorderLayout());
 	private TimeBar timeBar;
@@ -81,15 +86,13 @@ public class MainFrame {
 		right.setMinimumSize(new Dimension(500, 670));
 		main.setRightComponent(right);
 
-		
 		// Video section
-		videoPlayer = new VideoPlayer(canvas,null,null,null,null);
+		videoPlayer = new VideoPlayer(canvas, null, null, null, null);
 		mediaPlayer = videoPlayer.getMediaPlayer();
 		canvas.setBackground(Color.black);
 		canvas.setVisible(true);
 		right.add(canvas, BorderLayout.CENTER);
 
-		
 		// General buttons section
 		Icon downloadIcon = new ImageIcon(getClass().getResource(
 				"/download.png"));
@@ -112,13 +115,14 @@ public class MainFrame {
 		open.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-			    try {
-			    	JFileChooser fc = new JFileChooser();
+				try {
+					JFileChooser fc = new JFileChooser();
 					fc.showOpenDialog(null);
 					_videoLocation = fc.getSelectedFile().getAbsolutePath();
-					
+
 					Path source = Paths.get(_videoLocation);
-					if(Files.probeContentType(source).contains("video")||Files.probeContentType(source).contains("audio")){
+					if (Files.probeContentType(source).contains("video")
+							|| Files.probeContentType(source).contains("audio")) {
 						if (mediaPlayer.isPlayable()) {
 							videoPlayer.cancel();
 						}
@@ -128,10 +132,12 @@ public class MainFrame {
 						videoPlayer.execute();
 						playback.setPlayButton();
 					} else {
-						JOptionPane.showMessageDialog(frame,
-							    "This is not a video or audio file, please choose another file.",
-							    "Invalid file type",
-							    JOptionPane.ERROR_MESSAGE);
+						JOptionPane
+								.showMessageDialog(
+										frame,
+										"This is not a video or audio file, please choose another file.",
+										"Invalid file type",
+										JOptionPane.ERROR_MESSAGE);
 					}
 				} catch (IOException e1) {
 					e1.printStackTrace();
@@ -147,13 +153,13 @@ public class MainFrame {
 
 		right.add(general, BorderLayout.NORTH);
 
-		
 		// Tabs section
 		JLabel audioIconLabel = new JLabel("Audio");
 		Icon audioIcon = new ImageIcon(getClass().getResource("/audio.png"));
 		audioIconLabel.setIcon(audioIcon);
 		JLabel subtitleIconLabel = new JLabel("Subtitle");
-		Icon subtitleIcon = new ImageIcon(getClass().getResource("/subtitle.png"));
+		Icon subtitleIcon = new ImageIcon(getClass().getResource(
+				"/subtitle.png"));
 		subtitleIconLabel.setIcon(subtitleIcon);
 		JLabel titleIconLabel = new JLabel("Title/Credit");
 		Icon titleIcon = new ImageIcon(getClass().getResource("/audio.png"));
@@ -161,56 +167,55 @@ public class MainFrame {
 		JLabel effectsIconLabel = new JLabel("Effects");
 		Icon effectsIcon = new ImageIcon(getClass().getResource("/effects.png"));
 		effectsIconLabel.setIcon(effectsIcon);
-		
+
 		JPanel audioTab = new JPanel();
 		AudioTab audio = new AudioTab();
 		audioTab.add(audio);
 		tabbedPane.addTab("Audio", audio);
-		
+
 		JPanel subTab = new JPanel();
 		SubtitleTab sub = new SubtitleTab(canvas, timeBar, playback, effects);
 		subTab.add(sub);
 		tabbedPane.addTab("Subtitle", subTab);
-		
+
 		JPanel titleTab = new JPanel();
 		TitleCreditTab titlecredit = new TitleCreditTab();
 		titleTab.add(titlecredit);
 		tabbedPane.addTab("Title/Credits", titleTab);
-		
+
 		effects = new Effects();
 		tabbedPane.addTab("Effects", effects);
 		left.add(tabbedPane, BorderLayout.CENTER);
-		
+
 		tabbedPane.setTabComponentAt(0, audioIconLabel);
 		tabbedPane.setTabComponentAt(1, subtitleIconLabel);
 		tabbedPane.setTabComponentAt(2, titleIconLabel);
 		tabbedPane.setTabComponentAt(3, effectsIconLabel);
-		
-		
+
 		// Dock section
-		timeBar = new TimeBar(frame,mediaPlayer);
+		timeBar = new TimeBar(frame, mediaPlayer);
 		videoPlayer.setTimeBar(timeBar);
 		dock.add(timeBar, BorderLayout.CENTER);
 
-		playback = new Playback(frame,mediaPlayer,canvas,_videoLocation,timeBar,effects);
+		playback = new Playback(frame, mediaPlayer, canvas, _videoLocation,
+				timeBar, effects);
 		dock.add(playback, BorderLayout.SOUTH);
-		
+
 		right.add(dock, BorderLayout.SOUTH);
-		
+
 		sub.setTimeBar(timeBar);
 		sub.setPlayback(playback);
 		sub.setEffects(effects);
-		
-		
+
 		// Main frame
 		frame.setContentPane(main);
 		frame.setLocation(100, 100);
 		frame.setSize(1250, 700);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
-		
+
 		// Create .VAMIX folder
 		String homeDir = System.getProperty("user.home");
-		new File(homeDir+"/.VAMIX").mkdirs();
+		new File(homeDir + "/.VAMIX").mkdirs();
 	}
 }

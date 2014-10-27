@@ -28,6 +28,18 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 
+/**
+ * 
+ * Responsible for adding credit scenes onto a video file. It draws the credit
+ * part of the Title/Credit tab, and manages the background processes for adding
+ * and editing credits.
+ * 
+ * It is quite similar to AddTitle, however does not require many steps in
+ * AddTitle, hence is placed in a separate class.
+ * 
+ * @author zoe
+ *
+ */
 public class AddCredit extends JPanel {
 	private JPanel inputPanel = new JPanel();
 	private JLabel inputFileLabel = new JLabel("Source file: ");
@@ -217,8 +229,8 @@ public class AddCredit extends JPanel {
 			if (!outputField.getText().endsWith(".mp4")) {
 				outputField.setText(outputField.getText() + ".mp4");
 			}
-			
-			//check if file exists
+
+			// check if file exists
 			try {
 				String chkFileExistsCmd = "test -e " + outputField.getText();
 				ProcessBuilder checkFileBuilder = new ProcessBuilder("bash",
@@ -230,7 +242,7 @@ public class AddCredit extends JPanel {
 				if (checkFileProcess.exitValue() == 0) {
 					Log log = new Log(false, outputField.getText().toString());
 					String logResult = log.checkLog();
-					if (logResult!=null){
+					if (logResult != null) {
 						String[] parts = logResult.split("\t");
 						sourceField.setText(parts[2]);
 						outputField.setText(parts[1]);
@@ -239,10 +251,14 @@ public class AddCredit extends JPanel {
 						fontChoice.setSelectedItem(parts[5]);
 						colourChoice.setSelectedItem(parts[6]);
 						positionChoiceVertical.setSelectedItem(parts[7]);
-						durationChoice.setSelectedItem(Integer.parseInt(parts[8]));
+						durationChoice.setSelectedItem(Integer
+								.parseInt(parts[8]));
 					} else {
-						JOptionPane.showMessageDialog(null, "Output file exists, please change file name if you do would not like to overwrite this file.", "Warning",
-                                JOptionPane.WARNING_MESSAGE);
+						JOptionPane
+								.showMessageDialog(
+										null,
+										"Output file exists, please change file name if you do would not like to overwrite this file.",
+										"Warning", JOptionPane.WARNING_MESSAGE);
 					}
 				}
 			} catch (IOException | InterruptedException e1) {
@@ -441,8 +457,8 @@ public class AddCredit extends JPanel {
 			// Concatenate the videos
 			String concatenate;
 			concatenate = "avconv -y -i \"concat:" + videoLocation + "|"
-					+ _vamixDir + "/credit.mpg\" -c copy "
-					+ _vamixDir +"/finalVideoCred.mpg";
+					+ _vamixDir + "/credit.mpg\" -c copy " + _vamixDir
+					+ "/finalVideoCred.mpg";
 			System.out.println(concatenate);
 			ProcessBuilder concatenateBuilder = new ProcessBuilder("bash",
 					"-c", concatenate);
@@ -450,11 +466,10 @@ public class AddCredit extends JPanel {
 			Process concatenateProcess = concatenateBuilder.start();
 			concatenateProcess.waitFor();
 			concatenateProcess.destroy();
-			
-			//Convert mpg to mp4
-			String convertCmd = "avconv -y -i "
-					+ _vamixDir + "/finalVideoCred.mpg"
-					+ " -acodec copy -vcodec copy "
+
+			// Convert mpg to mp4
+			String convertCmd = "avconv -y -i " + _vamixDir
+					+ "/finalVideoCred.mpg" + " -acodec copy -vcodec copy "
 					+ outputField.getText();
 			ProcessBuilder convertBuilder = new ProcessBuilder("bash", "-c",
 					convertCmd);
@@ -470,7 +485,8 @@ public class AddCredit extends JPanel {
 			progress.setIndeterminate(false);
 			new Log(false, outputField.getText(), sourceField.getText(),
 					text.getText(), sizeChoice.getSelectedItem().toString(),
-					fontChoice.getSelectedItem().toString(), colourChoice.getSelectedItem().toString(),
+					fontChoice.getSelectedItem().toString(), colourChoice
+							.getSelectedItem().toString(),
 					positionChoiceVertical.getSelectedItem().toString(),
 					durationChoice.getSelectedItem().toString());
 		}

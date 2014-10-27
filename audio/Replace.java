@@ -20,6 +20,17 @@ import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+/**
+ * 
+ * Replaces audio in a video file. This is the class that is responsible for
+ * drawing the input components and carrying out the background processes to
+ * allow the replacement.
+ * 
+ * It uses avconv.
+ * 
+ * @author zoe
+ *
+ */
 public class Replace extends JPanel {
 	private File sourceVideoFile;
 	private File sourceAudioFile;

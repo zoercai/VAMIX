@@ -1,8 +1,6 @@
 package audio;
 
-import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -13,9 +11,7 @@ import java.nio.file.Paths;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -24,8 +20,18 @@ import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+/**
+ * 
+ * Overlays audio onto a video file. This is the class that is responsible for
+ * drawing the input components and carrying out the background processes to
+ * allow the overlay.
+ * 
+ * It uses avconv.
+ * 
+ * @author zoe
+ *
+ */
 public class Overlay extends JPanel{
-	private JFrame parent;
 	private File sourceVideoFile;
 	private File sourceAudioFile;
 	private File outputFile;

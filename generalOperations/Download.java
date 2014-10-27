@@ -12,9 +12,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -31,6 +28,21 @@ import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 
+/**
+ * 
+ * Downloads media files from the internet. This is the class responsible for
+ * drawing the pop-up dialog and all of its components. It is responsible for
+ * carrying out the background task that enables the download.
+ * 
+ * It uses wget.
+ * 
+ * Reference:
+ * http://stackoverflow.com/questions/5801993/quickest-way-to-get-content-type
+ * Used for confirming that the file being downloaded is a media file.
+ * 
+ * @author zoe
+ *
+ */
 public class Download {
 	private JFrame parent;
 	private String outputFile;
@@ -126,7 +138,8 @@ public class Download {
 				try {
 					if (urlField != null && outputFile != null
 							&& openSourceCheck.isSelected()) {
-						// REFERENCE http://stackoverflow.com/questions/5801993/quickest-way-to-get-content-type
+						// REFERENCE
+						// http://stackoverflow.com/questions/5801993/quickest-way-to-get-content-type
 						URL urlURL;
 						urlURL = new URL(urlField.getText());
 						HttpURLConnection connection = (HttpURLConnection) urlURL

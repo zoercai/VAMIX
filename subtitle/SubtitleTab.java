@@ -6,7 +6,6 @@ import generalOperations.TimeBar;
 import gui.VideoPlayer;
 
 import java.awt.Canvas;
-import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
@@ -40,6 +39,15 @@ import javax.swing.table.DefaultTableModel;
 
 import uk.co.caprica.vlcj.player.MediaPlayer;
 
+/**
+ * 
+ * Responsible for generating and reading subtitles for video files. It draws
+ * all the components in the Subtitle tab, and manages the background processes
+ * and logic for subtitle generation.
+ * 
+ * @author zoe
+ *
+ */
 public class SubtitleTab extends JPanel {
 	Canvas _canvas;
 	TimeBar _timeBar;
@@ -68,7 +76,7 @@ public class SubtitleTab extends JPanel {
 	int numRows = 1;
 	DefaultTableModel model = new DefaultTableModel(numRows, columnNames.length);
 	JTable table;
-	
+
 	private JPanel tableControlPanel = new JPanel();
 	private JButton addRow = new JButton("Add row");
 	private JButton deleteRow = new JButton("Delete row");
@@ -104,7 +112,7 @@ public class SubtitleTab extends JPanel {
 		table = new JTable(model);
 		table.setAutoCreateRowSorter(true);
 		main.add(new JScrollPane(table));
-		
+
 		main.add(tableControlPanel);
 		tableControlPanel.add(addRow);
 		tableControlPanel.add(deleteRow);
@@ -115,7 +123,7 @@ public class SubtitleTab extends JPanel {
 		bottomPanel.add(saveButton);
 
 		add(main);
-		
+
 		inputField.getDocument().addDocumentListener(new DocumentListener() {
 
 			@Override
@@ -130,7 +138,7 @@ public class SubtitleTab extends JPanel {
 
 			@Override
 			public void removeUpdate(DocumentEvent arg0) {
-				//inputCheck();
+				// inputCheck();
 			}
 		});
 
@@ -267,11 +275,9 @@ public class SubtitleTab extends JPanel {
 									"Highlighted rows contain errors! \n All cells should be filled in, end time should not be earlier than start time, and end time should not be later than the start time of the next row.",
 									"Warning", JOptionPane.WARNING_MESSAGE);
 				} else {
-					JOptionPane
-					.showMessageDialog(
-							null,
-							"All correct, you may save safely.",
-							"Great!", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(null,
+							"All correct, you may save safely.", "Great!",
+							JOptionPane.INFORMATION_MESSAGE);
 				}
 
 			}
@@ -280,7 +286,7 @@ public class SubtitleTab extends JPanel {
 		saveButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+
 				validate();
 
 				// Check if any row is selected (meaning error)
@@ -333,7 +339,7 @@ public class SubtitleTab extends JPanel {
 									"Error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
-			
+
 		});
 	}
 
@@ -348,32 +354,30 @@ public class SubtitleTab extends JPanel {
 	public void setEffects(Effects effects) {
 		_effects = effects;
 	}
-	
-	public void clear(){
-		for (int i = ((DefaultTableModel) table.getModel())
-				.getRowCount() - 1; i > -1; i--) {
+
+	public void clear() {
+		for (int i = ((DefaultTableModel) table.getModel()).getRowCount() - 1; i > -1; i--) {
 			((DefaultTableModel) table.getModel()).removeRow(i);
 		}
 		model.addRow(new Object[] { null, null, null });
 	}
-	
-	public void inputCheck(){
+
+	public void inputCheck() {
 		try {
 			// Check if video file exists
 			File f = new File(inputField.getText());
-			if(f.exists()) {
+			if (f.exists()) {
 				// File exists, check if .srt file exists for this video file
 				int pos = inputField.getText().lastIndexOf(".");
 				String filePathName;
 				if (pos == -1) {
 					filePathName = inputField.getText();
 				} else {
-					filePathName = inputField.getText().substring(
-							0, pos);
+					filePathName = inputField.getText().substring(0, pos);
 				}
-				String chkSRTExistsCmd = "test -e " + filePathName+".srt";
-				ProcessBuilder checkSRTBuilder = new ProcessBuilder("bash", "-c",
-						chkSRTExistsCmd);
+				String chkSRTExistsCmd = "test -e " + filePathName + ".srt";
+				ProcessBuilder checkSRTBuilder = new ProcessBuilder("bash",
+						"-c", chkSRTExistsCmd);
 				checkSRTBuilder.redirectErrorStream(true);
 				Process checkSRTProcess;
 				checkSRTProcess = checkSRTBuilder.start();
@@ -381,28 +385,26 @@ public class SubtitleTab extends JPanel {
 				if (checkSRTProcess.exitValue() == 0) {
 					// .srt file exists for video file, load values into table
 					clear();
-					BufferedReader br = new BufferedReader(new FileReader(new File(filePathName+".srt")));
+					BufferedReader br = new BufferedReader(new FileReader(
+							new File(filePathName + ".srt")));
 					String line;
 					while ((line = br.readLine()) != null) {
-						int row = Integer.parseInt(line)-1;
+						int row = Integer.parseInt(line) - 1;
 						line = br.readLine();
 						String startTime = line.substring(3, 8);
-						String endTime = line.substring(20,25);
+						String endTime = line.substring(20, 25);
 						line = br.readLine();
 						String textContent = line;
 						br.readLine();
 						model.setValueAt(startTime, row, 0);
 						model.setValueAt(textContent, row, 1);
-					    model.setValueAt(endTime, row, 2);
-					    model.addRow(new Object[] { null, null, null });
+						model.setValueAt(endTime, row, 2);
+						model.addRow(new Object[] { null, null, null });
 					}
 					br.close();
 				}
 			} else {
-				JOptionPane
-				.showMessageDialog(
-						null,
-						"File doesn't exist!",
+				JOptionPane.showMessageDialog(null, "File doesn't exist!",
 						"Error", JOptionPane.ERROR_MESSAGE);
 			}
 		} catch (IOException | InterruptedException e) {
@@ -434,7 +436,7 @@ public class SubtitleTab extends JPanel {
 		for (int i = 0; i < table.getRowCount() - 1; i++) {
 			// Checks if any end time value is greater than the next start time
 			// value
-			if(!table.isRowSelected(i)){
+			if (!table.isRowSelected(i)) {
 				if (table.getValueAt(i, 2).toString()
 						.compareTo(table.getValueAt(i + 1, 0).toString()) > 0) {
 					table.addRowSelectionInterval(i, i);
@@ -447,10 +449,9 @@ public class SubtitleTab extends JPanel {
 					}
 				}
 			}
-			
+
 		}
-		
-		
+
 	}
 
 }

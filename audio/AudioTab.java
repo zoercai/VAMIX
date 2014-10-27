@@ -8,9 +8,13 @@ import javax.swing.JPanel;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
+/**
+ * 
+ * AudioTab is the JPanel that contains all audio functions.
+ * @author zoe
+ *
+ */
 public class AudioTab extends JPanel{
-	
-	private JPanel main = new JPanel();
 	
 	public AudioTab(){
 		

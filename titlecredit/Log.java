@@ -2,15 +2,22 @@ package titlecredit;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
 
+/**
+ * 
+ * This is the class responsible for logging the title and credit history, so
+ * that the video files can be edited again. It is also responsible for reading
+ * the entries in the log and returning a line, if possible, that contains all
+ * the information required for either the AddCredit or AddTitle class to
+ * re-edit the original video file.
+ * 
+ * @author zoe
+ *
+ */
 public class Log {
 
 	String _vamixDir;
@@ -25,15 +32,14 @@ public class Log {
 	String _colour;
 	String _position;
 	String _duration;
-	
-	
+
 	// For checking log
 	Boolean _checkTitle;
 	String _checkOutputPath;
-	
 
 	/**
 	 * Constructor for adding an entry to log
+	 * 
 	 * @param isTitle
 	 * @param outputPath
 	 * @param inputPath
@@ -65,14 +71,14 @@ public class Log {
 		try {
 			new FileOutputStream(_vamixDir + "/log.txt", true).close();
 			FileWriter logFile = new FileWriter(_vamixDir + "/log.txt", true);
-			if(_isTitle){
+			if (_isTitle) {
 				line = "Title\t";
-			} else{
+			} else {
 				line = "Credit\t";
 			}
-			line += _outputPath + "\t" + _inputPath
-					+ "\t" + _text + "\t" + _size + "\t" + _font + "\t"
-					+ _colour + "\t" + _position + "\t" + _duration + "\t\n";
+			line += _outputPath + "\t" + _inputPath + "\t" + _text + "\t"
+					+ _size + "\t" + _font + "\t" + _colour + "\t" + _position
+					+ "\t" + _duration + "\t\n";
 			logFile.write(line);
 			logFile.close();
 		} catch (IOException e) {
@@ -80,52 +86,54 @@ public class Log {
 		}
 
 	}
-	
+
 	/**
 	 * Constructor for checking for an entry in log
+	 * 
 	 * @param isTitle
-	 * @param outputPath : the path of the input video
+	 * @param outputPath
+	 *            : the path of the input video
 	 * 
 	 */
-	public Log(Boolean isTitle,String outputPath){
+	public Log(Boolean isTitle, String outputPath) {
 		_checkTitle = isTitle;
 		_checkOutputPath = outputPath;
 	}
-	
-	public String checkLog(){
+
+	public String checkLog() {
 		String homeDir = System.getProperty("user.home");
 		_vamixDir = homeDir + "/.VAMIX";
-		
+
 		String checkLine;
-		if(_checkTitle){
+		if (_checkTitle) {
 			checkLine = "Title\t";
 		} else {
 			checkLine = "Credit\t";
 		}
 		checkLine = checkLine + _checkOutputPath + "\t";
-		
+
 		System.out.println(checkLine);
-		
+
 		String entry = null;
-		
+
 		try {
-			BufferedReader br = new BufferedReader(new FileReader(new File(_vamixDir + "/log.txt")));
+			BufferedReader br = new BufferedReader(new FileReader(new File(
+					_vamixDir + "/log.txt")));
 			String line;
 			Boolean isFound = false;
 			while (((line = br.readLine()) != null)) {
 				System.out.println(line);
-			   if(line.startsWith(checkLine)){
-				   System.out.println("file found");
-				   entry = line;
-			   }
+				if (line.startsWith(checkLine)) {
+					System.out.println("file found");
+					entry = line;
+				}
 			}
 			br.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return entry;
 	}
-	
-	
+
 }

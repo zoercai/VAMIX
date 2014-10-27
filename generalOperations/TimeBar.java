@@ -1,7 +1,6 @@
 package generalOperations;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -15,27 +14,35 @@ import javax.swing.plaf.basic.BasicSliderUI;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 
+/**
+ * 
+ * Displays time and progress of the video, as well as control the video time.
+ * This is the class responsible for the drawing of the timebar related
+ * components as well as the logic and processes.
+ * 
+ * @author zoe
+ *
+ */
 public class TimeBar extends JPanel {
-	
+
 	JFrame _frame;
 	MediaPlayer _video;
-	
+
 	// TimeBar
 	private JSlider timeBar = new JSlider(0, 0);
-	
+
 	private JPanel timeCountPanel = new JPanel();
 	private JLabel timeCountLabel = new JLabel("Current time: ");
 	private JLabel timeCount = new JLabel(" --:-- ");
-	
+
 	private JPanel timeTotalPanel = new JPanel();
 	private JLabel timeTotalLabel = new JLabel("Total time: ");
 	private JLabel timeTotal = new JLabel(" --:-- ");
-	
-	
-	public TimeBar(JFrame frame,EmbeddedMediaPlayer video){
+
+	public TimeBar(JFrame frame, EmbeddedMediaPlayer video) {
 		_frame = frame;
 		_video = video;
-		
+
 		// Progress Bar Setup
 		timeCount.setHorizontalAlignment(JTextField.CENTER);
 		timeCountPanel.add(timeCountLabel);
@@ -50,32 +57,35 @@ public class TimeBar extends JPanel {
 		timeTotal.setHorizontalAlignment(JTextField.CENTER);
 		this.add(timeTotalPanel, BorderLayout.EAST);
 	}
-	
-	public String getTime(){
+
+	public String getTime() {
 		return timeCount.getText();
 	}
-	
-	public void setMaximum(int max){
+
+	public void setMaximum(int max) {
 		timeBar.setMaximum(max);
-		timeTotal.setText(String.format("%02d:%02d", (int)max/60000, (int)max%60000/1000));
+		timeTotal.setText(String.format("%02d:%02d", (int) max / 60000,
+				(int) max % 60000 / 1000));
 	}
-	
-	public void setMediaPlayer(MediaPlayer video){
+
+	public void setMediaPlayer(MediaPlayer video) {
 		_video = video;
 	}
-	
-	public void setValue(int time){
+
+	public void setValue(int time) {
 		timeBar.setValue(time);
-		if (!timeCount.getText().equals(String.format("%02d:%02d", time/60000, time%60000/1000))){
-			timeCount.setText(String.format("%02d:%02d", time/60000, time%60000/1000));
+		if (!timeCount.getText().equals(
+				String.format("%02d:%02d", time / 60000, time % 60000 / 1000))) {
+			timeCount.setText(String.format("%02d:%02d", time / 60000,
+					time % 60000 / 1000));
 		}
 	}
-	
-	public void stop(){
+
+	public void stop() {
 		timeBar.setValue(0);
 		timeCount.setText("--:--");
 	}
-	
+
 	private class timeListener implements MouseListener {
 		@Override
 		public void mouseClicked(MouseEvent e) {
