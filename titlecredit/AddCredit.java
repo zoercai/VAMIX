@@ -105,11 +105,13 @@ public class AddCredit extends JPanel {
 
 		inputPanel.add(inputFileLabel);
 		sourceField.setColumns(20);
+		sourceField.setEditable(false);
 		inputPanel.add(sourceField);
 		inputPanel.add(sourceBrowse);
 
 		outputPanel.add(outputFileLabel);
 		outputField.setColumns(20);
+		outputField.setEditable(false);
 		outputPanel.add(outputField);
 		outputPanel.add(outputBrowse);
 

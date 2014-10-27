@@ -52,6 +52,7 @@ public class Extract extends JPanel{
 		
 		main.add(inputPanel);
 		inputField.setColumns(20);
+		inputField.setEditable(false);
 		inputPanel.add(inputLabel);
 		inputPanel.add(inputField);
 		inputPanel.add(inputSelectButton);
@@ -59,6 +60,7 @@ public class Extract extends JPanel{
 		main.add(outputPanel);
 		outputPanel.add(outputLabel);
 		outputField.setColumns(20);
+		outputField.setEditable(false);
 		outputPanel.add(outputField);
 		outputPanel.add(outputSelectButton);
 		

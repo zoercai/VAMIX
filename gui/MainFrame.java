@@ -27,6 +27,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import audio.AudioTab;
+import subtitle.SubtitleTab;
 import titlecredit.AddTitle;
 import titlecredit.TitleCreditTab;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
@@ -41,9 +42,6 @@ public class MainFrame {
 	// Tabs section
 	private JTabbedPane tabbedPane = new JTabbedPane();
 	private Effects effects;
-	private JPanel tab2 = new JPanel(new FlowLayout());
-	private JTextField temp = new JTextField("hello");
-	private JTextField temp2 = new JTextField("hell2o");
 	// left-----------------------------------------------
 
 	// right----------------------------------------------
@@ -133,13 +131,6 @@ public class MainFrame {
 
 		
 		// Tabs section
-		tab2.add(temp2);
-		
-		JPanel audioTab = new JPanel();
-		AudioTab audio = new AudioTab();
-		audioTab.add(audio);
-		tabbedPane.addTab("Audio", audio);
-
 		JLabel audioIconLabel = new JLabel("Audio");
 		Icon audioIcon = new ImageIcon(getClass().getResource("/audio.png"));
 		audioIconLabel.setIcon(audioIcon);
@@ -149,11 +140,23 @@ public class MainFrame {
 		JLabel titleIconLabel = new JLabel("Title/Credit");
 		Icon titleIcon = new ImageIcon(getClass().getResource("/audio.png"));
 		titleIconLabel.setIcon(titleIcon);
+		JLabel effectsIconLabel = new JLabel("Effects");
+		Icon effectsIcon = new ImageIcon(getClass().getResource("/effects.png"));
+		effectsIconLabel.setIcon(effectsIcon);
+		
+		JPanel audioTab = new JPanel();
+		AudioTab audio = new AudioTab();
+		audioTab.add(audio);
+		tabbedPane.addTab("Audio", audio);
+		
+		JPanel subTab = new JPanel();
+		SubtitleTab sub = new SubtitleTab(canvas, timeBar, playback, effects);
+		subTab.add(sub);
+		tabbedPane.addTab("Subtitle", subTab);
 		
 		JPanel titleTab = new JPanel();
 		TitleCreditTab titlecredit = new TitleCreditTab();
 		titleTab.add(titlecredit);
-		tabbedPane.addTab("Subtitle", tab2);
 		tabbedPane.addTab("Title/Credits", titleTab);
 		
 		effects = new Effects();
@@ -163,6 +166,7 @@ public class MainFrame {
 		tabbedPane.setTabComponentAt(0, audioIconLabel);
 		tabbedPane.setTabComponentAt(1, subtitleIconLabel);
 		tabbedPane.setTabComponentAt(2, titleIconLabel);
+		tabbedPane.setTabComponentAt(3, effectsIconLabel);
 		
 		
 		// Dock section
@@ -174,12 +178,16 @@ public class MainFrame {
 		dock.add(playback, BorderLayout.SOUTH);
 		
 		right.add(dock, BorderLayout.SOUTH);
-
+		
+		sub.setTimeBar(timeBar);
+		sub.setPlayback(playback);
+		sub.setEffects(effects);
+		
 		
 		// Main frame
 		frame.setContentPane(main);
 		frame.setLocation(100, 100);
-		frame.setSize(1250, 670);
+		frame.setSize(1250, 700);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 		

@@ -106,7 +106,7 @@ public class VideoPlayer extends SwingWorker<Void, Integer> {
 		_playback.endReached();
 	}
 	
-	protected void cancel(){
+	public void cancel(){
 		_mediaPlayer.stop();
 		_timeBar.stop();
 		timeBarTimer.stop();

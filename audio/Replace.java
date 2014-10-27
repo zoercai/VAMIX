@@ -56,12 +56,14 @@ public class Replace extends JPanel {
 
 		main.add(inputVideoPanel);
 		inputVideoField.setColumns(20);
+		inputVideoField.setEditable(false);
 		inputVideoPanel.add(inputVideoLabel);
 		inputVideoPanel.add(inputVideoField);
 		inputVideoPanel.add(inputVideoSelectButton);
 
 		main.add(inputAudioPanel);
 		inputAudioField.setColumns(20);
+		inputAudioField.setEditable(false);
 		inputAudioPanel.add(inputAudioLabel);
 		inputAudioPanel.add(inputAudioField);
 		inputAudioPanel.add(inputAudioSelectButton);
@@ -69,6 +71,7 @@ public class Replace extends JPanel {
 		main.add(outputPanel);
 		outputPanel.add(outputLabel);
 		outputField.setColumns(20);
+		outputField.setEditable(false);
 		outputPanel.add(outputField);
 		outputPanel.add(outputSelectButton);
 

@@ -51,6 +51,10 @@ public class TimeBar extends JPanel {
 		this.add(timeTotalPanel, BorderLayout.EAST);
 	}
 	
+	public String getTime(){
+		return timeCount.getText();
+	}
+	
 	public void setMaximum(int max){
 		timeBar.setMaximum(max);
 		timeTotal.setText(String.format("%02d:%02d", (int)max/60000, (int)max%60000/1000));
