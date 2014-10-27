@@ -13,6 +13,10 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -21,6 +25,7 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -107,17 +112,30 @@ public class MainFrame {
 		open.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser fc = new JFileChooser();
-				fc.showOpenDialog(null);
-				_videoLocation = fc.getSelectedFile().getAbsolutePath();
-				if (mediaPlayer.isPlayable()){
-					videoPlayer.cancel();
-					//videoPlayer.cancel(true);
+			    try {
+			    	JFileChooser fc = new JFileChooser();
+					fc.showOpenDialog(null);
+					_videoLocation = fc.getSelectedFile().getAbsolutePath();
+					
+					Path source = Paths.get(_videoLocation);
+					if(Files.probeContentType(source).contains("video")||Files.probeContentType(source).contains("audio")){
+						if (mediaPlayer.isPlayable()) {
+							videoPlayer.cancel();
+						}
+						videoPlayer = new VideoPlayer(canvas, _videoLocation,
+								timeBar, playback, effects);
+						mediaPlayer = videoPlayer.getMediaPlayer();
+						videoPlayer.execute();
+						playback.setPlayButton();
+					} else {
+						JOptionPane.showMessageDialog(frame,
+							    "This is not a video or audio file, please choose another file.",
+							    "Invalid file type",
+							    JOptionPane.ERROR_MESSAGE);
+					}
+				} catch (IOException e1) {
+					e1.printStackTrace();
 				}
-				videoPlayer = new VideoPlayer(canvas,_videoLocation,timeBar,playback,effects);
-				mediaPlayer = videoPlayer.getMediaPlayer();
-				videoPlayer.execute();
-				playback.setPlayButton();
 			}
 		});
 

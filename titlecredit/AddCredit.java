@@ -1,12 +1,16 @@
 package titlecredit;
 
 import java.awt.FlowLayout;
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -94,7 +98,7 @@ public class AddCredit extends JPanel {
 
 	String _vamixDir;
 
-	public AddCredit() { // TODO check input is video?
+	public AddCredit() {
 		String homeDir = System.getProperty("user.home");
 		_vamixDir = homeDir + "/.VAMIX";
 
@@ -173,11 +177,30 @@ public class AddCredit extends JPanel {
 	private class inputBrowseListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			JFileChooser fc = new JFileChooser();
-			fc.showOpenDialog(null);
-			File file = fc.getSelectedFile();
-			videoLocation = file.getAbsolutePath();
-			sourceField.setText(videoLocation);
+			try {
+				JFileChooser fc = new JFileChooser();
+				fc.showOpenDialog(null);
+				File file = fc.getSelectedFile();
+				videoLocation = file.getAbsolutePath();
+				if (file.exists()) {
+					Path source = Paths.get(file.toString());
+					if (Files.probeContentType(source).contains("video")) {
+						sourceField.setText(videoLocation);
+					} else {
+						JOptionPane
+								.showMessageDialog(
+										null,
+										"This is not a video file, please choose another file.",
+										"Invalid file type",
+										JOptionPane.ERROR_MESSAGE);
+					}
+				} else {
+					JOptionPane.showMessageDialog(null, "File doesn't exist!",
+							"Error", JOptionPane.ERROR_MESSAGE);
+				}
+			} catch (HeadlessException | IOException f) {
+				f.printStackTrace();
+			}
 		}
 	}
 
@@ -185,14 +208,14 @@ public class AddCredit extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JFileChooser fileSaver = new JFileChooser();
-			fileSaver.setFileFilter(new FileNameExtensionFilter(".mpg",
-					"MP4 audio format")); // TODO check right format
+			fileSaver.setFileFilter(new FileNameExtensionFilter("MP4 format",
+					"mp4"));
 			fileSaver.showDialog(null, "Name output video file");
 			saveLocation = fileSaver.getSelectedFile().getAbsolutePath();
 			outputField.setText(saveLocation.toString());
-			// If user did not enter .mpg file extension, add it
-			if (!outputField.getText().endsWith(".mpg")) {
-				outputField.setText(outputField.getText() + ".mpg");
+			// If user did not enter .mp4 file extension, add it
+			if (!outputField.getText().endsWith(".mp4")) {
+				outputField.setText(outputField.getText() + ".mp4");
 			}
 			
 			//check if file exists
@@ -419,7 +442,7 @@ public class AddCredit extends JPanel {
 			String concatenate;
 			concatenate = "avconv -y -i \"concat:" + videoLocation + "|"
 					+ _vamixDir + "/credit.mpg\" -c copy "
-					+ outputField.getText();
+					+ _vamixDir +"/finalVideoCred.mpg";
 			System.out.println(concatenate);
 			ProcessBuilder concatenateBuilder = new ProcessBuilder("bash",
 					"-c", concatenate);
@@ -427,6 +450,17 @@ public class AddCredit extends JPanel {
 			Process concatenateProcess = concatenateBuilder.start();
 			concatenateProcess.waitFor();
 			concatenateProcess.destroy();
+			
+			//Convert mpg to mp4
+			String convertCmd = "avconv -y -i "
+					+ _vamixDir + "/finalVideoCred.mpg"
+					+ " -acodec copy -vcodec copy "
+					+ outputField.getText();
+			ProcessBuilder convertBuilder = new ProcessBuilder("bash", "-c",
+					convertCmd);
+			convertBuilder.redirectErrorStream(true);
+			Process convertProcess = convertBuilder.start();
+			convertProcess.waitFor();
 
 			return null;
 		}

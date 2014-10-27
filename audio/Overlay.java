@@ -6,6 +6,10 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -83,20 +87,51 @@ public class Overlay extends JPanel{
 		inputVideoSelectButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				JFileChooser videoOpener = new JFileChooser();
-				videoOpener.showDialog(null, "Choose source video file");
-				sourceVideoFile = videoOpener.getSelectedFile();
-				inputVideoField.setText(sourceVideoFile.toString());
+
+				try {
+					JFileChooser videoOpener = new JFileChooser();
+					videoOpener.showDialog(null, "Choose source video file");
+					sourceVideoFile = videoOpener.getSelectedFile();
+
+					Path source = Paths.get(sourceVideoFile.toString());
+					if (Files.probeContentType(source).contains("video")) {
+						inputVideoField.setText(sourceVideoFile.toString());
+					} else {
+						JOptionPane
+								.showMessageDialog(
+										null,
+										"This is not a video file, please choose another file.",
+										"Invalid file type",
+										JOptionPane.ERROR_MESSAGE);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		});
 
 		inputAudioSelectButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				JFileChooser audioOpener = new JFileChooser();
-				audioOpener.showDialog(null, "Choose source audio file");
-				sourceAudioFile = audioOpener.getSelectedFile();
-				inputAudioField.setText(sourceAudioFile.toString());
+				try {
+					JFileChooser audioOpener = new JFileChooser();
+					audioOpener.showDialog(null, "Choose source audio file");
+					sourceAudioFile = audioOpener.getSelectedFile();
+
+					Path source = Paths.get(sourceAudioFile.toString());
+					if (Files.probeContentType(source).contains("audio")) {
+						inputAudioField.setText(sourceAudioFile.toString());
+					} else {
+						JOptionPane
+								.showMessageDialog(
+										null,
+										"This is not an audio file, please choose another file.",
+										"Invalid file type",
+										JOptionPane.ERROR_MESSAGE);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		});
 
@@ -106,7 +141,7 @@ public class Overlay extends JPanel{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser fileSaver = new JFileChooser();
-				fileSaver.setFileFilter(new FileNameExtensionFilter(".avi","AVI audio format"));
+				fileSaver.setFileFilter(new FileNameExtensionFilter("AVI video format","avi"));
 				fileSaver.showDialog(null, "Name output video file");
 				outputFile = fileSaver.getSelectedFile();
 				outputField.setText(outputFile.toString());

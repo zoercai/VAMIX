@@ -8,6 +8,10 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -21,6 +25,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class Extract extends JPanel{
 
@@ -75,10 +80,26 @@ public class Extract extends JPanel{
 		inputSelectButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				JFileChooser fileOpener = new JFileChooser();
-				fileOpener.showDialog(null,"Choose video file to be extracted");
-				sourceFile = fileOpener.getSelectedFile();
-				inputField.setText(sourceFile.toString());
+				
+				try {
+					JFileChooser fileOpener = new JFileChooser();
+					fileOpener.showDialog(null,"Choose video file to be extracted");
+					sourceFile = fileOpener.getSelectedFile();
+					
+					Path source = Paths.get(sourceFile.toString());
+					if(Files.probeContentType(source).contains("video")){
+						inputField.setText(sourceFile.toString());
+					} else {
+						JOptionPane.showMessageDialog(null,
+							    "This is not a video file, please choose another file.",
+							    "Invalid file type",
+							    JOptionPane.ERROR_MESSAGE);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
+				
 			}
 		});
 		
@@ -87,6 +108,7 @@ public class Extract extends JPanel{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser fileSaver = new JFileChooser();
+				fileSaver.setFileFilter(new FileNameExtensionFilter("MP3 audio format","mp3"));
 				fileSaver.showDialog(null, "Name output audio file");
 				outputFile = fileSaver.getSelectedFile();
 				outputField.setText(outputFile.toString());

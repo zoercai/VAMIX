@@ -7,9 +7,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -29,7 +34,7 @@ import javax.swing.SwingWorker;
 public class Download {
 	private JFrame parent;
 	private String outputFile;
-	
+
 	private JDialog downloadMain = new JDialog(parent, "Download");
 	private JPanel main = new JPanel();
 	private FlowLayout flow = new FlowLayout();
@@ -43,31 +48,30 @@ public class Download {
 	private JTextField outputField = new JTextField();
 	private JButton outputSelectButton = new JButton("Browse");
 
-	
 	private JProgressBar progressBar = new JProgressBar();
 
 	private JPanel bottomPanel = new JPanel(new FlowLayout());
 	private JButton downloadButton = new JButton("Download");
-	
+
 	private JPanel openSourcePanel = new JPanel(flow);
 	private JLabel openSourceLabel = new JLabel("Open Source?");
 	private JCheckBox openSourceCheck = new JCheckBox();
-	
-	public Download(JFrame parent){
+
+	public Download(JFrame parent) {
 		this.parent = parent;
-		
-		//Sets the position of the new window
+
+		// Sets the position of the new window
 		if (parent != null) {
 			Dimension parentSize = parent.getSize();
 			Point p = parent.getLocation();
 			downloadMain.setLocation(p.x + parentSize.width / 4, p.y
 					+ parentSize.height / 4);
 		}
-		
+
 		flow.setVgap(15);
-		
-		main.setLayout(new BoxLayout(main,BoxLayout.PAGE_AXIS));
-		
+
+		main.setLayout(new BoxLayout(main, BoxLayout.PAGE_AXIS));
+
 		main.add(urlPanel);
 		urlField.setColumns(30);
 		urlPanel.add(urlLabel);
@@ -75,74 +79,108 @@ public class Download {
 		urlPanel.add(openSourcePanel);
 		urlPanel.add(openSourceLabel);
 		urlPanel.add(openSourceCheck);
-		
+
 		main.add(outputPanel);
 		outputPanel.add(outputLabel);
 		outputField.setColumns(30);
 		outputPanel.add(outputField);
 		outputPanel.add(outputSelectButton);
-		
+
 		main.add(bottomPanel);
 		bottomPanel.add(progressBar);
 		bottomPanel.add(downloadButton);
-		
+
 		downloadMain.getContentPane().add(main);
-		
+
 		downloadMain.pack();
 		downloadMain.setVisible(true);
-		
+
 		// Allows user to specify location and name of the output file
-		outputSelectButton.addActionListener(new ActionListener(){
+		outputSelectButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					JFileChooser fileSaver = new JFileChooser();
 					URL downloadURL;
-					if(urlField.getText()!=""){
+					if (urlField.getText() != "") {
 						downloadURL = new URL(urlField.getText());
-						fileSaver.setSelectedFile(new File(downloadURL.getFile()));
-					}					
-					fileSaver.showDialog(null,"Save");
+						fileSaver.setSelectedFile(new File(downloadURL
+								.getFile()));
+					}
+					fileSaver.showDialog(null, "Save");
 					outputFile = fileSaver.getSelectedFile().toString();
 					outputField.setText(outputFile);
 				} catch (MalformedURLException e) {
 					JFileChooser fileSaver = new JFileChooser();
-					fileSaver.showDialog(null,"Save");
+					fileSaver.showDialog(null, "Save");
 					outputFile = fileSaver.getSelectedFile().toString();
 					outputField.setText(outputFile);
 				}
 			}
 		});
-		
+
 		// download button, activates the DownloadBackground process
-		downloadButton.addActionListener(new ActionListener(){
+		downloadButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if(urlField!=null && outputFile!=null && openSourceCheck.isSelected()){
-					DownloadBackground download = new DownloadBackground(urlField.getText(),outputFile);
-					download.execute();
-				} else if(!openSourceCheck.isSelected()){
-					JOptionPane.showMessageDialog(null,"File is not open source, I refuse to download!");
-				} else{
-					JOptionPane.showMessageDialog(null,"Please ensure both URL and output file are specified.");
+				try {
+					if (urlField != null && outputFile != null
+							&& openSourceCheck.isSelected()) {
+						// REFERENCE http://stackoverflow.com/questions/5801993/quickest-way-to-get-content-type
+						URL urlURL;
+						urlURL = new URL(urlField.getText());
+						HttpURLConnection connection = (HttpURLConnection) urlURL
+								.openConnection();
+						connection.setRequestMethod("HEAD");
+						connection.connect();
+						String contentType = connection.getContentType();
+						if (contentType.contains("audio")
+								|| contentType.contains("video")) {
+
+							DownloadBackground download = new DownloadBackground(
+									urlField.getText(), outputFile);
+							download.execute();
+						} else {
+							JOptionPane
+									.showMessageDialog(
+											null,
+											"This is not a video or audio file, please choose another file.",
+											"Invalid file type",
+											JOptionPane.ERROR_MESSAGE);
+						}
+					}
+
+					else if (!openSourceCheck.isSelected()) {
+						JOptionPane
+								.showMessageDialog(null,
+										"File is not open source, I refuse to download!");
+					} else {
+						JOptionPane
+								.showMessageDialog(null,
+										"Please ensure both URL and output file are specified.");
+					}
+
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
+
 			}
 		});
 	}
-	
-	
+
 	public class DownloadBackground extends SwingWorker<Integer, Integer> {
 		private String url;
 		private String outputFile;
 		private int status;
-		
-		public DownloadBackground(String url,String outputFile) {
+
+		public DownloadBackground(String url, String outputFile) {
 			this.url = url;
 			this.outputFile = outputFile;
 		}
-		
+
 		@Override
 		protected Integer doInBackground() throws Exception {
+
 			String chkFileExistsCmd = "test -e " + outputFile;
 			ProcessBuilder checkFileBuilder = new ProcessBuilder("bash", "-c",
 					chkFileExistsCmd);
@@ -151,7 +189,7 @@ public class Download {
 			if (!isCancelled()) {
 				status = checkFileProcess.waitFor();
 			}
-			if (checkFileProcess.exitValue() == 0) { 
+			if (checkFileProcess.exitValue() == 0) {
 				// if file exists -alert user,ask for options
 				Object[] options = { "Override File", "Resume Download",
 						"Cancel" };
@@ -184,10 +222,11 @@ public class Download {
 							publish(percent.get());
 						}
 					}
-					if (!isCancelled()) {  		//while not cancelled, keep the process going
+					if (!isCancelled()) { // while not cancelled, keep the
+											// process going
 						status = ovrProcess.waitFor();
 					}
-					//if exit value isn't 0, show error.
+					// if exit value isn't 0, show error.
 					if (ovrProcess.exitValue() != 0) {
 						JOptionPane
 								.showMessageDialog(null,
@@ -198,7 +237,7 @@ public class Download {
 					ovrProcess.getOutputStream().close();
 					ovrProcess.getErrorStream().close();
 					ovrProcess.destroy();
-				} else if (a == JOptionPane.NO_OPTION) { 
+				} else if (a == JOptionPane.NO_OPTION) {
 					// resume option
 					String resCmd = "wget " + "--progress=dot -c " + url
 							+ " -O " + outputFile;
@@ -234,18 +273,18 @@ public class Download {
 				} else {
 					this.cancel(true);
 				}
-			} else { 
+			} else {
 				// file doesn't exist, download
 				String dwnCmd = "wget " + " --progress=dot " + url + " -O "
 						+ outputFile;
-				//System.out.println(dwnCmd);
+				// System.out.println(dwnCmd);
 				ProcessBuilder downloadBuilder = new ProcessBuilder("bash",
 						"-c", dwnCmd);
 				downloadBuilder.redirectErrorStream(true);
 				Process downloadProcess = downloadBuilder.start();
 
 				progressBar.setIndeterminate(true);
-				
+
 				BufferedReader stdoutDownload = new BufferedReader(
 						new InputStreamReader(downloadProcess.getInputStream()));
 				String line;
@@ -272,12 +311,9 @@ public class Download {
 				downloadProcess.destroy();
 
 			}
-
 			return status;
 		}
 
-		
-		
 		@Override
 		protected void process(List<Integer> chunks) {
 		}

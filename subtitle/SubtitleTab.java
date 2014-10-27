@@ -8,6 +8,7 @@ import gui.VideoPlayer;
 import java.awt.Canvas;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -16,6 +17,9 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
@@ -134,19 +138,31 @@ public class SubtitleTab extends JPanel {
 		inputSelectButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				JFileChooser fileOpener = new JFileChooser();
-				fileOpener
-						.showDialog(null, "Choose video file to be extracted");
-				sourceFile = fileOpener.getSelectedFile();
-				if(sourceFile.exists()) {
-					inputField.setText(sourceFile.toString());
-					playButton.setEnabled(true);
-				} else {
-					JOptionPane
-					.showMessageDialog(
-							null,
-							"File doesn't exist!",
-							"Error", JOptionPane.ERROR_MESSAGE);
+				try {
+					JFileChooser fileOpener = new JFileChooser();
+					fileOpener.showDialog(null,
+							"Choose video file to be extracted");
+					sourceFile = fileOpener.getSelectedFile();
+					if (sourceFile.exists()) {
+						Path source = Paths.get(sourceFile.toString());
+						if (Files.probeContentType(source).contains("video")) {
+							inputField.setText(sourceFile.toString());
+							playButton.setEnabled(true);
+						} else {
+							JOptionPane
+									.showMessageDialog(
+											null,
+											"This is not a video file, please choose another file.",
+											"Invalid file type",
+											JOptionPane.ERROR_MESSAGE);
+						}
+					} else {
+						JOptionPane.showMessageDialog(null,
+								"File doesn't exist!", "Error",
+								JOptionPane.ERROR_MESSAGE);
+					}
+				} catch (HeadlessException | IOException e) {
+					e.printStackTrace();
 				}
 			}
 		});
