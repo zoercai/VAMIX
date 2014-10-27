@@ -8,6 +8,7 @@ import generalOperations.TimeBar;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -29,6 +30,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+
 import audio.AudioTab;
 import subtitle.SubtitleTab;
 import titlecredit.TitleCreditTab;
@@ -150,6 +152,34 @@ public class MainFrame {
 		help.setBorder(BorderFactory.createEmptyBorder());
 		help.setContentAreaFilled(false);
 		general.add(help);
+		help.addActionListener(new ActionListener(){
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//REFERENCE http://www.mkyong.com/java/how-to-open-a-pdf-file-in-java/
+				
+				try {
+				File pdfFile = new File("reportUser.pdf");
+				if (pdfFile.exists()) {
+					if (Desktop.isDesktopSupported()) {
+						Desktop.getDesktop().open(pdfFile);
+					} else {
+						System.out.println("Awt Desktop is not supported!");
+					}
+		 
+				} else {
+					System.out.println("File does not exists!");
+				}
+				JOptionPane.showMessageDialog(frame, "Please check the resources folder if a pdf does not open");
+				System.out.println("Done");
+		 
+			  } catch (Exception ex) {
+				ex.printStackTrace();
+			  }
+			}
+		 
+			
+		});
 
 		right.add(general, BorderLayout.NORTH);
 
